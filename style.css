@@ -1,0 +1,75 @@
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #0b0e14;
+  color: #ffffff;
+  text-align: center;
+  margin: 0;
+  padding: 20px;
+}
+
+header h1 {
+  color: #00d2ff;
+  margin-bottom: 5px;
+}
+
+.tournament-bracket {
+  display: flex;
+  justify-content: center;
+  gap: 40px;
+  margin-top: 40px;
+  align-items: center;
+}
+
+.round {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+.match {
+  background: #161b22;
+  border: 1px solid #30363d;
+  border-radius: 8px;
+  width: 200px;
+  overflow: hidden;
+}
+
+.team {
+  padding: 12px 15px;
+  display: flex;
+  justify-content: space-between;
+  cursor: pointer;
+  transition: background 0.2s;
+  border-bottom: 1px solid #21262d;
+}
+
+.team:last-child {
+  border-bottom: none;
+}
+
+.team:hover {
+  background: #238636;
+}
+
+.team.placeholder {
+  color: #8b949e;
+  cursor: default;
+}
+
+.team.placeholder:hover {
+  background: transparent;
+}
+
+.prob {
+  font-size: 0.85em;
+  color: #58a6ff;
+  font-weight: bold;
+}
+
+.winner-box {
+  background: #1f6beb;
+  padding: 20px;
+  border-radius: 10px;
+  font-weight: bold;
+  font-size: 1.2em;
+}
