@@ -1,61 +1,306 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ИИ Прогнозы: Лига Чемпионов</title>
-  <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Tournament Simulator 1/8</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #0f172a;
+            color: #f8fafc;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            margin: 0;
+        }
+
+        h1 {
+            color: #38bdf8;
+            margin-bottom: 10px;
+        }
+
+        .controls {
+            margin-bottom: 25px;
+        }
+
+        button {
+            background-color: #2563eb;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.2s;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
+        }
+
+        button:hover {
+            background-color: #1d4ed8;
+            transform: translateY(-2px);
+        }
+
+        button:disabled {
+            background-color: #475569;
+            cursor: not-allowed;
+            box-shadow: none;
+            transform: none;
+        }
+
+        .tournament-container {
+            display: flex;
+            gap: 20px;
+            overflow-x: auto;
+            width: 100%;
+            max-width: 1400px;
+            justify-content: center;
+            padding-bottom: 20px;
+        }
+
+        .round {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-around;
+            min-width: 280px;
+        }
+
+        .round-title {
+            text-align: center;
+            font-weight: bold;
+            color: #94a3b8;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .match-card {
+            background-color: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 8px;
+            padding: 12px;
+            margin: 10px 0;
+            transition: 0.3s;
+        }
+
+        .match-card.active {
+            border-color: #38bdf8;
+            box-shadow: 0 0 15px rgba(56, 189, 248, 0.3);
+        }
+
+        .team {
+            display: flex;
+            justify-content: space-between;
+            padding: 6px 0;
+            font-weight: 500;
+        }
+
+        .team.winner {
+            color: #4ade80;
+            font-weight: bold;
+        }
+
+        .ai-predict {
+            margin-top: 8px;
+            padding-top: 8px;
+            border-top: 1px dashed #475569;
+            font-size: 12px;
+            color: #fbbf24;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .winner-box {
+            margin-top: 20px;
+            padding: 20px;
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            border: 2px solid #f59e0b;
+            border-radius: 12px;
+            text-align: center;
+            display: none;
+        }
+
+        .winner-box h2 {
+            color: #f59e0b;
+            margin: 0 0 10px 0;
+        }
+    </style>
 </head>
 <body>
 
-  <header>
-    <h1>🏆 ИИ Протектор: Лига Чемпионов</h1>
-    <p>Нажимай на команду, чтобы симулировать проход дальше на основе прогноза ИИ</p>
-  </header>
-
-  <main class="tournament-bracket">
-    <!-- 1/4 Финала -->
-    <div class="round round-quarter">
-      <h3>1/4 Финала</h3>
-      
-      <div class="match" id="match-1">
-        <div class="team" onclick="selectWinner('match-1', 'Real Madrid', 'semi-1', 'team-top')">
-          <span>Real Madrid</span> <span class="prob">65%</span>
-        </div>
-        <div class="team" onclick="selectWinner('match-1', 'Arsenal', 'semi-1', 'team-top')">
-          <span>Arsenal</span> <span class="prob">35%</span>
-        </div>
-      </div>
-
-      <div class="match" id="match-2">
-        <div class="team" onclick="selectWinner('match-2', 'Manchester City', 'semi-1', 'team-bottom')">
-          <span>Manchester City</span> <span class="prob">70%</span>
-        </div>
-        <div class="team" onclick="selectWinner('match-2', 'Bayern Munich', 'semi-1', 'team-bottom')">
-          <span>Bayern Munich</span> <span class="prob">30%</span>
-        </div>
-      </div>
+    <h1>🏆 Симуляция Турнира ИИ (1/8 Финала)</h1>
+    
+    <div class="controls">
+        <button id="start-btn" onclick="startTournament()">🚀 Запустить турнир</button>
     </div>
 
-    <!-- 1/2 Финала -->
-    <div class="round round-semi">
-      <h3>1/2 Финала</h3>
-      
-      <div class="match" id="semi-1">
-        <div class="team team-top placeholder">Победитель 1</div>
-        <div class="team team-bottom placeholder">Победитель 2</div>
-      </div>
+    <div class="tournament-container">
+        <div class="round" id="round-1/8">
+            <div class="round-title">1/8 Финала</div>
+        </div>
+        <div class="round" id="round-1/4">
+            <div class="round-title">1/4 Финала</div>
+        </div>
+        <div class="round" id="round-1/2">
+            <div class="round-title">1/2 Финала</div>
+        </div>
+        <div class="round" id="round-final">
+            <div class="round-title">Финал</div>
+        </div>
     </div>
 
-    <!-- Финал / Победитель -->
-    <div class="round round-final">
-      <h3>Победитель</h3>
-      <div class="winner-box" id="champ-box">
-        🏆 Нажми на клуб в сетке!
-      </div>
+    <div id="winner-box" class="winner-box">
+        <h2>👑 Победитель Турнира</h2>
+        <h1 id="winner-name" style="color: #4ade80; margin: 0;">-</h1>
     </div>
-  </main>
 
-  <script src="script.js"></script>
+    <script>
+        // 16 команд с их базовым рейтингом (атака/защита)
+        const initialTeams = [
+            { name: "Реал Мадрид", rating: 92 },
+            { name: "Манчестер Сити", rating: 93 },
+            { name: "Бавария", rating: 89 },
+            { name: "ПСЖ", rating: 87 },
+            { name: "Барселона", rating: 88 },
+            { name: "Арсенал", rating: 87 },
+            { name: "Интер", rating: 86 },
+            { name: "Атлетико", rating: 84 },
+            { name: "Боруссия Д", rating: 83 },
+            { name: "Ювентус", rating: 82 },
+            { name: "Ливерпуль", rating: 90 },
+            { name: "Челси", rating: 81 },
+            { name: "Байер Леверкузен", rating: 86 },
+            { name: "Милан", rating: 82 },
+            { name: "Бенфика", rating: 80 },
+            { name: "Спортинг", rating: 79 }
+        ];
+
+        let delay = 1200; // Пауза между матчами в мс (чтобы успевать смотреть)
+
+        // Функция перемешивания массива
+        function shuffle(array) {
+            return array.sort(() => Math.random() - 0.5);
+        }
+
+        // Прогноз ИИ перед матчем
+        function getAiPrediction(team1, team2) {
+            const form1 = (Math.random() * 10 - 5); // Форма дня (-5 до +5)
+            const form2 = (Math.random() * 10 - 5);
+            
+            const power1 = team1.rating + form1;
+            const power2 = team2.rating + form2;
+
+            const total = power1 + power2;
+            const prob1 = Math.round((power1 / total) * 100);
+            const prob2 = 100 - prob1;
+
+            const predictedWinner = prob1 >= prob2 ? team1.name : team2.name;
+            return { prob1, prob2, predictedWinner };
+        }
+
+        // Симуляция самого матча
+        function simulateMatch(team1, team2) {
+            // Шанс победы зависит от рейтинга + рандом
+            const chance1 = team1.rating / (team1.rating + team2.rating);
+            
+            let score1 = 0;
+            let score2 = 0;
+
+            // Генерируем голы
+            for(let i = 0; i < 5; i++) {
+                if (Math.random() < chance1 * 0.4) score1++;
+                if (Math.random() < (1 - chance1) * 0.4) score2++;
+            }
+
+            // В случае ничьей — пенальти (добавляем гол)
+            if (score1 === score2) {
+                Math.random() < chance1 ? score1++ : score2++;
+            }
+
+            const winner = score1 > score2 ? team1 : team2;
+            return { score1, score2, winner };
+        }
+
+        async function startTournament() {
+            document.getElementById('start-btn').disabled = true;
+            document.getElementById('winner-box').style.display = 'none';
+
+            // Очистка сетки
+            ['1/8', '1/4', '1/2', 'final'].forEach(r => {
+                const el = document.getElementById(`round-${r}`);
+                el.innerHTML = `<div class="round-title">${r === 'final' ? 'Финал' : r + ' Финала'}</div>`;
+            });
+
+            // Формируем 1/8 финала
+            let currentTeams = shuffle([...initialTeams]);
+            
+            // Этапы турнира
+            const rounds = ['1/8', '1/4', '1/2', 'final'];
+
+            for (let rIndex = 0; rIndex < rounds.length; rIndex++) {
+                const roundName = rounds[rIndex];
+                const roundEl = document.getElementById(`round-${roundName}`);
+                const nextTeams = [];
+
+                for (let i = 0; i < currentTeams.length; i += 2) {
+                    const t1 = currentTeams[i];
+                    const t2 = currentTeams[i+1];
+
+                    // 1. ИИ делает прогноз
+                    const pred = getAiPrediction(t1, t2);
+
+                    // Создаем карточку матча
+                    const matchCard = document.createElement('div');
+                    matchCard.className = 'match-card active';
+                    matchCard.innerHTML = `
+                        <div class="team" id="t1-${roundName}-${i}">
+                            <span>${t1.name}</span>
+                            <span class="score">-</span>
+                        </div>
+                        <div class="team" id="t2-${roundName}-${i}">
+                            <span>${t2.name}</span>
+                            <span class="score">-</span>
+                        </div>
+                        <div class="ai-predict">
+                            <span>🤖 ИИ Прогноз:</span>
+                            <span><b>${pred.predictedWinner}</b> (${Math.max(pred.prob1, pred.prob2)}%)</span>
+                        </div>
+                    `;
+                    roundEl.appendChild(matchCard);
+
+                    // Небольшая задержка перед симуляцией
+                    await new Promise(res => setTimeout(res, delay));
+
+                    // 2. Симуляция матча
+                    const res = simulateMatch(t1, t2);
+
+                    // Обновляем визуально счет и победителя
+                    const t1El = matchCard.querySelector(`#t1-${roundName}-${i}`);
+                    const t2El = matchCard.querySelector(`#t2-${roundName}-${i}`);
+
+                    t1El.querySelector('.score').innerText = res.score1;
+                    t2El.querySelector('.score').innerText = res.score2;
+
+                    if (res.winner.name === t1.name) {
+                        t1El.classList.add('winner');
+                    } else {
+                        t2El.classList.add('winner');
+                    }
+
+                    matchCard.classList.remove('active');
+                    nextTeams.push(res.winner);
+                }
+
+                currentTeams = nextTeams;
+            }
+
+            // Показываем кубок победителя
+            document.getElementById('winner-name').innerText = currentTeams[0].name;
+            document.getElementById('winner-box').style.display = 'block';
+            document.getElementById('start-btn').disabled = false;
+        }
+    </script>
 </body>
 </html>
