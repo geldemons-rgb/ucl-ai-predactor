@@ -3,35 +3,112 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI UCL Tournament Predictor</title>
+    <title>AI UEFA Champions League</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <h1>🏆 Симуляция Турнира ИИ (1/8 Финала)</h1>
-    
-    <div class="controls">
-        <button id="start-btn" onclick="startTournament()">🚀 Запустить турнир</button>
-    </div>
+    <header>
+        <h1>🏆 ИИ Симулятор Лиги Чемпионов</h1>
+        <button id="start-btn" onclick="startSimulation()">🚀 Запустить ИИ Симуляцию</button>
+    </header>
 
-    <div class="tournament-container">
-        <div class="round" id="round-1/8">
-            <div class="round-title">1/8 Финала</div>
-        </div>
-        <div class="round" id="round-1/4">
-            <div class="round-title">1/4 Финала</div>
-        </div>
-        <div class="round" id="round-1/2">
-            <div class="round-title">1/2 Финала</div>
-        </div>
-        <div class="round" id="round-final">
-            <div class="round-title">Финал</div>
-        </div>
-    </div>
+    <div class="bracket-container">
+        <!-- ЛЕВАЯ СЕТКА -->
+        <div class="side left-side">
+            <!-- 1/8 Финала Лево -->
+            <div class="round round-18">
+                <div class="match" id="m1">
+                    <div class="team t1"><span>PSG</span><span class="score">-</span></div>
+                    <div class="team t2"><span>Chelsea</span><span class="score">-</span></div>
+                </div>
+                <div class="match" id="m2">
+                    <div class="team t1"><span>Galatasaray</span><span class="score">-</span></div>
+                    <div class="team t2"><span>Liverpool</span><span class="score">-</span></div>
+                </div>
+                <div class="match" id="m3">
+                    <div class="team t1"><span>Real Madrid</span><span class="score">-</span></div>
+                    <div class="team t2"><span>Man City</span><span class="score">-</span></div>
+                </div>
+                <div class="match" id="m4">
+                    <div class="team t1"><span>Atalanta</span><span class="score">-</span></div>
+                    <div class="team t2"><span>Bayern</span><span class="score">-</span></div>
+                </div>
+            </div>
 
-    <div id="winner-box" class="winner-box">
-        <h2>👑 Победитель Турнира</h2>
-        <h1 id="winner-name" style="color: #4ade80; margin: 0;">-</h1>
+            <!-- 1/4 Финала Лево -->
+            <div class="round round-14">
+                <div class="match" id="m9">
+                    <div class="team t1"><span>-</span><span class="score">-</span></div>
+                    <div class="team t2"><span>-</span><span class="score">-</span></div>
+                </div>
+                <div class="match" id="m10">
+                    <div class="team t1"><span>-</span><span class="score">-</span></div>
+                    <div class="team t2"><span>-</span><span class="score">-</span></div>
+                </div>
+            </div>
+
+            <!-- 1/2 Финала Лево -->
+            <div class="round round-12">
+                <div class="match" id="m13">
+                    <div class="team t1"><span>-</span><span class="score">-</span></div>
+                    <div class="team t2"><span>-</span><span class="score">-</span></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ЦЕНТР (ФИНАЛ И КУБОК) -->
+        <div class="center-stage">
+            <div class="trophy">🏆</div>
+            <div class="match final-match" id="m15">
+                <div class="team t1"><span>Финалист 1</span><span class="score">-</span></div>
+                <div class="team t2"><span>Финалист 2</span><span class="score">-</span></div>
+            </div>
+            <div id="champ-title" class="champ-title"></div>
+        </div>
+
+        <!-- ПРАВАЯ СЕТКА -->
+        <div class="side right-side">
+            <!-- 1/2 Финала Право -->
+            <div class="round round-12">
+                <div class="match" id="m14">
+                    <div class="team t1"><span>-</span><span class="score">-</span></div>
+                    <div class="team t2"><span>-</span><span class="score">-</span></div>
+                </div>
+            </div>
+
+            <!-- 1/4 Финала Право -->
+            <div class="round round-14">
+                <div class="match" id="m11">
+                    <div class="team t1"><span>-</span><span class="score">-</span></div>
+                    <div class="team t2"><span>-</span><span class="score">-</span></div>
+                </div>
+                <div class="match" id="m12">
+                    <div class="team t1"><span>-</span><span class="score">-</span></div>
+                    <div class="team t2"><span>-</span><span class="score">-</span></div>
+                </div>
+            </div>
+
+            <!-- 1/8 Финала Право -->
+            <div class="round round-18">
+                <div class="match" id="m5">
+                    <div class="team t1"><span>Newcastle</span><span class="score">-</span></div>
+                    <div class="team t2"><span>Barcelona</span><span class="score">-</span></div>
+                </div>
+                <div class="match" id="m6">
+                    <div class="team t1"><span>Atletico</span><span class="score">-</span></div>
+                    <div class="team t2"><span>Tottenham</span><span class="score">-</span></div>
+                </div>
+                <div class="match" id="m7">
+                    <div class="team t1"><span>Bodø/Glimt</span><span class="score">-</span></div>
+                    <div class="team t2"><span>Sporting CP</span><span class="score">-</span></div>
+                </div>
+                <div class="match" id="m8">
+                    <div class="team t1"><span>Bayer Leverkusen</span><span class="score">-</span></div>
+                    <div class="team t2"><span>Arsenal</span><span class="score">-</span></div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script src="script.js"></script>
