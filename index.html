@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ИИ Прогнозы: Лига Чемпионов</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <header>
+    <h1>🏆 ИИ Протектор: Лига Чемпионов</h1>
+    <p>Нажимай на команду, чтобы симулировать проход дальше на основе прогноза ИИ</p>
+  </header>
+
+  <main class="tournament-bracket">
+    <!-- 1/4 Финала -->
+    <div class="round round-quarter">
+      <h3>1/4 Финала</h3>
+      
+      <div class="match" id="match-1">
+        <div class="team" onclick="selectWinner('match-1', 'Real Madrid', 'semi-1', 'team-top')">
+          <span>Real Madrid</span> <span class="prob">65%</span>
+        </div>
+        <div class="team" onclick="selectWinner('match-1', 'Arsenal', 'semi-1', 'team-top')">
+          <span>Arsenal</span> <span class="prob">35%</span>
+        </div>
+      </div>
+
+      <div class="match" id="match-2">
+        <div class="team" onclick="selectWinner('match-2', 'Manchester City', 'semi-1', 'team-bottom')">
+          <span>Manchester City</span> <span class="prob">70%</span>
+        </div>
+        <div class="team" onclick="selectWinner('match-2', 'Bayern Munich', 'semi-1', 'team-bottom')">
+          <span>Bayern Munich</span> <span class="prob">30%</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 1/2 Финала -->
+    <div class="round round-semi">
+      <h3>1/2 Финала</h3>
+      
+      <div class="match" id="semi-1">
+        <div class="team team-top placeholder">Победитель 1</div>
+        <div class="team team-bottom placeholder">Победитель 2</div>
+      </div>
+    </div>
+
+    <!-- Финал / Победитель -->
+    <div class="round round-final">
+      <h3>Победитель</h3>
+      <div class="winner-box" id="champ-box">
+        🏆 Нажми на клуб в сетке!
+      </div>
+    </div>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
