@@ -1,121 +1,126 @@
-body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #0f172a;
-    color: #f8fafc;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 20px;
-    margin: 0;
+const initialTeams = [
+    { name: "Реал Мадрид", rating: 92 },
+    { name: "Манчестер Сити", rating: 93 },
+    { name: "Бавария", rating: 89 },
+    { name: "ПСЖ", rating: 87 },
+    { name: "Барселона", rating: 88 },
+    { name: "Арсенал", rating: 87 },
+    { name: "Интер", rating: 86 },
+    { name: "Атлетико", rating: 84 },
+    { name: "Боруссия Д", rating: 83 },
+    { name: "Ювентус", rating: 82 },
+    { name: "Ливерпуль", rating: 90 },
+    { name: "Челси", rating: 81 },
+    { name: "Байер Леверкузен", rating: 86 },
+    { name: "Милан", rating: 82 },
+    { name: "Бенфика", rating: 80 },
+    { name: "Спортинг", rating: 79 }
+];
+
+let delay = 1000;
+
+function shuffle(array) {
+    return array.sort(() => Math.random() - 0.5);
 }
 
-h1 {
-    color: #38bdf8;
-    margin-bottom: 10px;
+function getAiPrediction(team1, team2) {
+    const form1 = (Math.random() * 10 - 5);
+    const form2 = (Math.random() * 10 - 5);
+    
+    const power1 = team1.rating + form1;
+    const power2 = team2.rating + form2;
+
+    const total = power1 + power2;
+    const prob1 = Math.round((power1 / total) * 100);
+    const prob2 = 100 - prob1;
+
+    const predictedWinner = prob1 >= prob2 ? team1.name : team2.name;
+    return { prob1, prob2, predictedWinner };
 }
 
-.controls {
-    margin-bottom: 25px;
+function simulateMatch(team1, team2) {
+    const chance1 = team1.rating / (team1.rating + team2.rating);
+    let score1 = 0;
+    let score2 = 0;
+
+    for(let i = 0; i < 5; i++) {
+        if (Math.random() < chance1 * 0.4) score1++;
+        if (Math.random() < (1 - chance1) * 0.4) score2++;
+    }
+
+    if (score1 === score2) {
+        Math.random() < chance1 ? score1++ : score2++;
+    }
+
+    const winner = score1 > score2 ? team1 : team2;
+    return { score1, score2, winner };
 }
 
-button {
-    background-color: #2563eb;
-    color: white;
-    border: none;
-    padding: 12px 24px;
-    font-size: 16px;
-    font-weight: bold;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: 0.2s;
-    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
-}
+async function startTournament() {
+    document.getElementById('start-btn').disabled = true;
+    document.getElementById('winner-box').style.display = 'none';
 
-button:hover {
-    background-color: #1d4ed8;
-    transform: translateY(-2px);
-}
+    ['1/8', '1/4', '1/2', 'final'].forEach(r => {
+        const el = document.getElementById(`round-${r}`);
+        el.innerHTML = `<div class="round-title">${r === 'final' ? 'Финал' : r + ' Финала'}</div>`;
+    });
 
-button:disabled {
-    background-color: #475569;
-    cursor: not-allowed;
-    box-shadow: none;
-    transform: none;
-}
+    let currentTeams = shuffle([...initialTeams]);
+    const rounds = ['1/8', '1/4', '1/2', 'final'];
 
-.tournament-container {
-    display: flex;
-    gap: 20px;
-    overflow-x: auto;
-    width: 100%;
-    max-width: 1400px;
-    justify-content: center;
-    padding-bottom: 20px;
-}
+    for (let rIndex = 0; rIndex < rounds.length; rIndex++) {
+        const roundName = rounds[rIndex];
+        const roundEl = document.getElementById(`round-${roundName}`);
+        const nextTeams = [];
 
-.round {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-around;
-    min-width: 280px;
-}
+        for (let i = 0; i < currentTeams.length; i += 2) {
+            const t1 = currentTeams[i];
+            const t2 = currentTeams[i+1];
 
-.round-title {
-    text-align: center;
-    font-weight: bold;
-    color: #94a3b8;
-    margin-bottom: 15px;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-}
+            const pred = getAiPrediction(t1, t2);
 
-.match-card {
-    background-color: #1e293b;
-    border: 1px solid #334155;
-    border-radius: 8px;
-    padding: 12px;
-    margin: 10px 0;
-    transition: 0.3s;
-}
+            const matchCard = document.createElement('div');
+            matchCard.className = 'match-card active';
+            matchCard.innerHTML = `
+                <div class="team" id="t1-${roundName}-${i}">
+                    <span>${t1.name}</span>
+                    <span class="score">-</span>
+                </div>
+                <div class="team" id="t2-${roundName}-${i}">
+                    <span>${t2.name}</span>
+                    <span class="score">-</span>
+                </div>
+                <div class="ai-predict">
+                    <span>🤖 ИИ:</span>
+                    <span><b>${pred.predictedWinner}</b> (${Math.max(pred.prob1, pred.prob2)}%)</span>
+                </div>
+            `;
+            roundEl.appendChild(matchCard);
 
-.match-card.active {
-    border-color: #38bdf8;
-    box-shadow: 0 0 15px rgba(56, 189, 248, 0.3);
-}
+            await new Promise(res => setTimeout(res, delay));
 
-.team {
-    display: flex;
-    justify-content: space-between;
-    padding: 6px 0;
-    font-weight: 500;
-}
+            const res = simulateMatch(t1, t2);
 
-.team.winner {
-    color: #4ade80;
-    font-weight: bold;
-}
+            const t1El = matchCard.querySelector(`#t1-${roundName}-${i}`);
+            const t2El = matchCard.querySelector(`#t2-${roundName}-${i}`);
 
-.ai-predict {
-    margin-top: 8px;
-    padding-top: 8px;
-    border-top: 1px dashed #475569;
-    font-size: 12px;
-    color: #fbbf24;
-    display: flex;
-    justify-content: space-between;
-}
+            t1El.querySelector('.score').innerText = res.score1;
+            t2El.querySelector('.score').innerText = res.score2;
 
-.winner-box {
-    margin-top: 20px;
-    padding: 20px;
-    background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
-    border: 2px solid #f59e0b;
-    border-radius: 12px;
-    text-align: center;
-    display: none;
-}
+            if (res.winner.name === t1.name) {
+                t1El.classList.add('winner');
+            } else {
+                t2El.classList.add('winner');
+            }
 
-.winner-box h2 {
-    color: #f59e0b;
-    margin: 0 0 10px 0;
+            matchCard.classList.remove('active');
+            nextTeams.push(res.winner);
+        }
+
+        currentTeams = nextTeams;
+    }
+
+    document.getElementById('winner-name').innerText = currentTeams[0].name;
+    document.getElementById('winner-box').style.display = 'block';
+    document.getElementById('start-btn').disabled = false;
 }
