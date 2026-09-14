@@ -1,126 +1,112 @@
-const initialTeams = [
-    { name: "Реал Мадрид", rating: 92 },
-    { name: "Манчестер Сити", rating: 93 },
-    { name: "Бавария", rating: 89 },
-    { name: "ПСЖ", rating: 87 },
-    { name: "Барселона", rating: 88 },
-    { name: "Арсенал", rating: 87 },
-    { name: "Интер", rating: 86 },
-    { name: "Атлетико", rating: 84 },
-    { name: "Боруссия Д", rating: 83 },
-    { name: "Ювентус", rating: 82 },
-    { name: "Ливерпуль", rating: 90 },
-    { name: "Челси", rating: 81 },
-    { name: "Байер Леверкузен", rating: 86 },
-    { name: "Милан", rating: 82 },
-    { name: "Бенфика", rating: 80 },
-    { name: "Спортинг", rating: 79 }
-];
+// Команды с ИИ-силой (на основе твоей картинки)
+const teamRatings = {
+    "PSG": 88, "Chelsea": 85,
+    "Galatasaray": 79, "Liverpool": 91,
+    "Real Madrid": 93, "Man City": 92,
+    "Atalanta": 83, "Bayern": 90,
+    "Newcastle": 84, "Barcelona": 89,
+    "Atletico": 86, "Tottenham": 83,
+    "Bodø/Glimt": 76, "Sporting CP": 82,
+    "Bayer Leverkusen": 87, "Arsenal": 88
+};
 
-let delay = 1000;
+const delay = 1000; // Пауза между матчами (1 сек)
 
-function shuffle(array) {
-    return array.sort(() => Math.random() - 0.5);
-}
+function playMatch(t1Name, t2Name) {
+    const r1 = teamRatings[t1Name] || 80;
+    const r2 = teamRatings[t2Name] || 80;
 
-function getAiPrediction(team1, team2) {
-    const form1 = (Math.random() * 10 - 5);
-    const form2 = (Math.random() * 10 - 5);
-    
-    const power1 = team1.rating + form1;
-    const power2 = team2.rating + form2;
-
-    const total = power1 + power2;
-    const prob1 = Math.round((power1 / total) * 100);
-    const prob2 = 100 - prob1;
-
-    const predictedWinner = prob1 >= prob2 ? team1.name : team2.name;
-    return { prob1, prob2, predictedWinner };
-}
-
-function simulateMatch(team1, team2) {
-    const chance1 = team1.rating / (team1.rating + team2.rating);
+    const chance1 = r1 / (r1 + r2);
     let score1 = 0;
     let score2 = 0;
 
-    for(let i = 0; i < 5; i++) {
-        if (Math.random() < chance1 * 0.4) score1++;
-        if (Math.random() < (1 - chance1) * 0.4) score2++;
+    for (let i = 0; i < 5; i++) {
+        if (Math.random() < chance1 * 0.45) score1++;
+        if (Math.random() < (1 - chance1) * 0.45) score2++;
     }
 
     if (score1 === score2) {
         Math.random() < chance1 ? score1++ : score2++;
     }
 
-    const winner = score1 > score2 ? team1 : team2;
-    return { score1, score2, winner };
+    return {
+        score1, score2,
+        winner: score1 > score2 ? t1Name : t2Name,
+        loser: score1 > score2 ? t2Name : t1Name
+    };
 }
 
-async function startTournament() {
-    document.getElementById('start-btn').disabled = true;
-    document.getElementById('winner-box').style.display = 'none';
+async function processMatch(matchId, nextMatchId, nextSlot) {
+    const matchEl = document.getElementById(matchId);
+    matchEl.classList.add('active');
 
-    ['1/8', '1/4', '1/2', 'final'].forEach(r => {
-        const el = document.getElementById(`round-${r}`);
-        el.innerHTML = `<div class="round-title">${r === 'final' ? 'Финал' : r + ' Финала'}</div>`;
-    });
+    const t1El = matchEl.querySelector('.t1');
+    const t2El = matchEl.querySelector('.t2');
 
-    let currentTeams = shuffle([...initialTeams]);
-    const rounds = ['1/8', '1/4', '1/2', 'final'];
+    const t1Name = t1El.querySelector('span').innerText;
+    const t2Name = t2El.querySelector('span').innerText;
 
-    for (let rIndex = 0; rIndex < rounds.length; rIndex++) {
-        const roundName = rounds[rIndex];
-        const roundEl = document.getElementById(`round-${roundName}`);
-        const nextTeams = [];
+    await new Promise(r => setTimeout(r, delay));
 
-        for (let i = 0; i < currentTeams.length; i += 2) {
-            const t1 = currentTeams[i];
-            const t2 = currentTeams[i+1];
+    const result = playMatch(t1Name, t2Name);
 
-            const pred = getAiPrediction(t1, t2);
+    t1El.querySelector('.score').innerText = result.score1;
+    t2El.querySelector('.score').innerText = result.score2;
 
-            const matchCard = document.createElement('div');
-            matchCard.className = 'match-card active';
-            matchCard.innerHTML = `
-                <div class="team" id="t1-${roundName}-${i}">
-                    <span>${t1.name}</span>
-                    <span class="score">-</span>
-                </div>
-                <div class="team" id="t2-${roundName}-${i}">
-                    <span>${t2.name}</span>
-                    <span class="score">-</span>
-                </div>
-                <div class="ai-predict">
-                    <span>🤖 ИИ:</span>
-                    <span><b>${pred.predictedWinner}</b> (${Math.max(pred.prob1, pred.prob2)}%)</span>
-                </div>
-            `;
-            roundEl.appendChild(matchCard);
-
-            await new Promise(res => setTimeout(res, delay));
-
-            const res = simulateMatch(t1, t2);
-
-            const t1El = matchCard.querySelector(`#t1-${roundName}-${i}`);
-            const t2El = matchCard.querySelector(`#t2-${roundName}-${i}`);
-
-            t1El.querySelector('.score').innerText = res.score1;
-            t2El.querySelector('.score').innerText = res.score2;
-
-            if (res.winner.name === t1.name) {
-                t1El.classList.add('winner');
-            } else {
-                t2El.classList.add('winner');
-            }
-
-            matchCard.classList.remove('active');
-            nextTeams.push(res.winner);
-        }
-
-        currentTeams = nextTeams;
+    if (result.winner === t1Name) {
+        t1El.classList.add('win');
+        t2El.classList.add('loss');
+    } else {
+        t2El.classList.add('win');
+        t1El.classList.add('loss');
     }
 
-    document.getElementById('winner-name').innerText = currentTeams[0].name;
-    document.getElementById('winner-box').style.display = 'block';
+    matchEl.classList.remove('active');
+
+    // Переносим победителя в следующий раунд
+    if (nextMatchId) {
+        const nextMatch = document.getElementById(nextMatchId);
+        const nextTeamSlot = nextMatch.querySelector('.' + nextSlot);
+        nextTeamSlot.querySelector('span').innerText = result.winner;
+    }
+
+    return result.winner;
+}
+
+async function startSimulation() {
+    document.getElementById('start-btn').disabled = true;
+    document.getElementById('champ-title').innerText = '';
+
+    // Сброс старых результатов
+    document.querySelectorAll('.team').forEach(el => {
+        el.classList.remove('win', 'loss');
+    });
+
+    // --- 1/8 ФИНАЛА ---
+    await processMatch('m1', 'm9', 't1');
+    await processMatch('m2', 'm9', 't2');
+    await processMatch('m3', 'm10', 't1');
+    await processMatch('m4', 'm10', 't2');
+
+    await processMatch('m5', 'm11', 't1');
+    await processMatch('m6', 'm11', 't2');
+    await processMatch('m7', 'm12', 't1');
+    await processMatch('m8', 'm12', 't2');
+
+    // --- 1/4 ФИНАЛА ---
+    await processMatch('m9', 'm13', 't1');
+    await processMatch('m10', 'm13', 't2');
+
+    await processMatch('m11', 'm14', 't1');
+    await processMatch('m12', 'm14', 't2');
+
+    // --- 1/2 ФИНАЛА ---
+    await processMatch('m13', 'm15', 't1');
+    await processMatch('m14', 'm15', 't2');
+
+    // --- ФИНАЛ ---
+    const champion = await processMatch('m15', null, null);
+
+    document.getElementById('champ-title').innerText = '👑 ЧЕМПИОН: ' + champion;
     document.getElementById('start-btn').disabled = false;
 }
